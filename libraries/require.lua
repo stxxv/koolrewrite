@@ -1,3 +1,5 @@
+if shared.requirecheck then return end
+
 local cloneref = cloneref or function(obj)
     return obj
 end 
@@ -31,7 +33,7 @@ do
 		return require(lplr.PlayerScripts.PlayerModule).controls
 	end)
 
-    if suc and shared.requirecheck == true and not xenoPste then
+    if suc and not xenoPste then
         return
     end
 
