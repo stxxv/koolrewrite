@@ -1,9 +1,12 @@
 local cloneref = cloneref or function(obj)
     return obj
-end
-local HttpService = cloneref(game:GetService('HttpService'))
-local xenoPste
+end 
 
+local HttpService = cloneref(game:GetService('HttpService'))
+local Players = cloneref(game:GetService('Players'))
+local lplr = Players.LocalPlayer
+
+local xenoPste
 do
 	local res = request({
 	    Url = 'https://httpbin.org/get',
