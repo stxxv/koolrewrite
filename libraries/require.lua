@@ -99,7 +99,7 @@ do
             return error('Requested module experienced an error while loading')
         end
 
-        local source = decompile(path)
+        local source = decompile(path):gsub(":WaitForChild%(%s*[\"']util[\"']%s*%)", ":FindFirstChild('util') or script.Parent")
         local func = loadstring(source)
 
         getfenv(func).require = getgenv().require
