@@ -90,6 +90,37 @@ do
 end
 
 do
+    local function wrapInst(path) -- waitforchild garbage
+        return setmetatable({}, {
+            __index = function(_, key)
+                if key == 'WaitForChild' then
+                    return function(_, child, timeout)
+                        timeout = timeout or 0
+
+                        task.delay(timeout, function()
+                            if instance:FindFirstChild(child) then
+                                return wrap(instance:FindFirstChild(child))
+                            end
+
+                            if instance:IsA('ModuleScript') then
+                                return script.Parent
+                            else
+                                return nil
+                            end
+                        end)
+                    end
+                end
+
+                local value = instance[key]
+                if typeof(value) == 'Instance' then
+                    return wrap(value)
+                end
+
+                return value
+            end
+        })
+    end
+
     getgenv().require = function(path: Instance)
         if not path or (path and not path:IsA('ModuleScript')) then
             return error('Attempted to call require with invalid arguments')
@@ -99,11 +130,11 @@ do
             return error('Requested module experienced an error while loading')
         end
 
-        local source = decompile(path):gsub(":WaitForChild%(%s*[\"']util[\"']%s*%)", ":FindFirstChild('util') or script.Parent")
+        local source = decompile(path)
         local func = loadstring(source)
 
         getfenv(func).require = getgenv().require
-        getfenv(func).script = path
+        getfenv(func).script = wrapInst(path) -- waitforchild garbage, bedwars uses invalid paths breaking the script..
         getfenv(func).error = function() return nil end -- prevent scripts from leaking into the environment, detecting kool aid..
 
         local suc, res = pcall(function()
